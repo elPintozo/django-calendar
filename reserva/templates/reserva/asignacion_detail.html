@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Detalle de Asignación</h1>
+  <p><strong>ID:</strong> {{ object.id }}</p>
+  <p><strong>Fecha Inicio:</strong> {{ object.fecha_inicio|date:"d/m/Y" }}</p>
+  <p><strong>Fecha Finalizacion:</strong> {{ object.fecha_fin|date:"d/m/Y" }}</p>
+  <p><strong>Chofer:</strong> 
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">{{ object.chofer }}</li>
+</ul>
+</p>
+
+  <p><strong>Ambulancia:</strong> {{ object.ambulancia }}</p>
+  <p>
+    <strong>Tens:</strong> 
+    <ul class="list-group list-group-flush">
+    {% for ten in object.tens.all %} <li class="list-group-item">{{ ten }}</li>{% endfor %}
+</ul>
+    </p>
+
+  <a href="{% url 'reserva:asignacion-update' pk=object.pk %}" class="btn btn-primary">Editar</a>
+  <a class="btn btn-danger" href="{% url 'reserva:asignacion-delete' pk=object.pk %}">Eliminar</a>
+  <a class="btn btn-success" href="{% url 'reserva:asignacion-list' %}">Volver a la lista de reservas</a>
+
+</div>
+{% endblock %}

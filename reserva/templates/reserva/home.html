@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ol class="list-group list-group-numbered">
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+        <div class="fw-bold">Ambulancias</div>
+        <a class="btn btn-primary btn-lg" href="{% url 'ambulancia:ambulancia-list' %}">Lista de ambulancias</a>
+        </div>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+        <div class="fw-bold">Tens</div>
+        <a class="btn btn-secondary btn-lg" href="{% url 'personal:tens-list' %}">Lista de Tens</a>
+        </div>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+        <div class="fw-bold">Choferes</div>
+        <a class="btn btn-success btn-lg" href="{% url 'personal:chofer-list' %}">Lista de Choferes</a>
+        </div>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+        <div class="fw-bold">Reservar</div>
+        <a class="btn btn-danger btn-lg" href="{% url 'reserva:asignacion-list' %}">Lista de reservas</a>
+        </div>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+        <div class="fw-bold">Calendario</div>
+        <a class="btn btn-info btn-lg" href="{% url 'reserva:calendario' %}">Calendario</a>
+        </div>
+    </li>
+</ol>
+{% endblock %}

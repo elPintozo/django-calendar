@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2 class="mb-4">Eliminar chofer</h2>
+    <p>¿Está seguro de que desea eliminar el siguiente chofer?</p>
+    <p><strong>Nombre:</strong> {{ chofer.nombre }}</p>
+    <p><strong>Apellido:</strong> {{ chofer.apellido }}</p>
+    <form method="post" class="mt-4">
+      {% csrf_token %}
+      <input type="submit" value="Eliminar" class="btn btn-danger">
+      <a href="{% url 'personal:chofer-list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
+{% endblock %}

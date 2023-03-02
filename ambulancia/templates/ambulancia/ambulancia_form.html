@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h2>{% if form.instance.pk %}Editar{% else %}Agregar{% endif %} ambulancia</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+    <a class="btn btn-success" href="{% url 'ambulancia:ambulancia-list' %}">Volver a la lista de ambulancias</a>
+  </div>
+{% endblock %}

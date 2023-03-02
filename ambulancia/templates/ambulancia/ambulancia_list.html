@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <a class="btn btn-dark btn-lg" href="{% url 'reserva:home' %}">Home</a>
+    
+    <h1>Listado de ambulancias</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Patente</th>
+          <th scope="col">Modelo</th>
+          <th scope="col">Estado de uso</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ambulancia in object_list %}
+        <tr>
+          <th scope="row">{{ forloop.counter }}</th>
+          <td>{{ ambulancia.patente }}</td>
+          <td>{{ ambulancia.modelo }}</td>
+          <td>{{ ambulancia.estado }}</td>
+          <td>
+            <a href="{% url 'ambulancia:ambulancia-detail' ambulancia.id %}" class="btn btn-sm btn-info">Detalles</a>
+            <a href="{% url 'ambulancia:ambulancia-update' ambulancia.id %}" class="btn btn-sm btn-warning">Editar</a>
+            <a href="{% url 'ambulancia:ambulancia-delete' ambulancia.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">No hay ambulancias registradas</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'ambulancia:ambulancia-create' %}" class="btn btn-primary">Nueva ambulancia</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>{{ ambulancia.nombre }}</h1>
+    <p><strong>Patente:</strong> {{ ambulancia.patente }}</p>
+    <p><strong>Modelo:</strong> {{ ambulancia.modelo }}</p>
+    <p><strong>Estado:</strong> {{ ambulancia.estado }}</p>
+    <p><strong>ubicacion:</strong> {{ ambulancia.ubicacion }}</p>
+    <p><strong>Descripción:</strong> {{ ambulancia.descripcion }}</p>
+
+    <a href="{% url 'ambulancia:ambulancia-update' pk=ambulancia.pk %}" class="btn btn-primary">Editar</a>
+    <a class="btn btn-danger" href="{% url 'ambulancia:ambulancia-delete' pk=ambulancia.pk %}">Eliminar</a>
+    <a class="btn btn-success" href="{% url 'ambulancia:ambulancia-list' %}">Volver a la lista de ambulancias</a>
+
+  </div>
+{% endblock %}

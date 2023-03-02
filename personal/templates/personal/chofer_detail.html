@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>{{ object.nombre }}</h1>
+    <p><strong>RUT:</strong> {{ object.dni }}</p>
+    <p><strong>Fecha de nacimiento:</strong> {{ object.fecha_nacimiento }}</p>
+    <p><strong>Correo electrónico:</strong> {{ object.email }}</p>
+    <p><strong>Teléfono:</strong> {{ object.telefono }}</p>
+    <p><strong>Profesión:</strong> {{ object.profesion }}</p>
+    <p><strong>Horario laboral:</strong> {{ object.horario_laboral }}</p>
+    <p><strong>Estado:</strong> {{ object.get_estado_display }}</p>
+    <br>
+    <a href="{% url 'personal:chofer-update' object.id %}" class="btn btn-primary">Editar</a>
+    <a href="{% url 'personal:chofer-delete' object.id %}" class="btn btn-danger">Eliminar</a>
+    <a href="{% url 'personal:chofer-list' %}" class="btn btn-secondary">Volver</a>
+  </div>
+{% endblock %}

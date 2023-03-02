@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <a class="btn btn-dark btn-lg" href="{% url 'reserva:home' %}">Home</a>
+
+  <h1>Lista de Tens</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Apellido</th>
+        <th scope="col">DNI</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tens in tens_list %}
+        <tr>
+          <td>{{ tens.nombre }}</td>
+          <td>{{ tens.apellido }}</td>
+          <td>{{ tens.dni }}</td>
+          <td>
+            <a href="{% url 'personal:tens-detail' tens.pk %}"class="btn btn-sm btn-info">Detalles</a>
+            <a href="{% url 'personal:tens-update' tens.pk %}"class="btn btn-sm btn-warning">Editar</a>
+            <a href="{% url 'personal:tens-delete' tens.pk %}"class="btn btn-sm btn-danger">Eliminar</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4">No Tens found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'personal:tens-create' %}" class="btn btn-primary">Nueva Tens</a>
+</div>
+{% endblock %}

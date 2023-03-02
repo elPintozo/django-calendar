@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Eliminar Reseva</h1>
+  <p>¿Estás seguro de que deseas eliminar la siguiente reserva?</p>
+
+  <p><strong>Ambulancia:</strong> {{ object.ambulancia }}</p>
+  <p><strong>Chofer:</strong> {{ object.chofer }}</p>
+  <p><strong>Tens:</strong> {{ object.tens.all|join:', ' }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+  </form>
+  <a href="{% url 'reserva:asignacion-list' %}" class="btn btn-secondary">Cancelar</a>
+</div>
+{% endblock %}
