@@ -9,8 +9,11 @@
           <div class="col-4">
             <ul class="list-group">
               <li class="list-group-item active" aria-current="true">Reservas</li>
-              
+              {% csrf_token %}
               {% for reserva in reservas %}
+				<input type='hidden'  id='event_{{reserva.id}}_url_detail_ajax' value='{% url "reserva:ajax-asignacion-detail" reserva.id %}'/>
+				<input type='hidden'  id='event_{{reserva.id}}_url_detail' value='{% url "reserva:asignacion-detail" reserva.id %}'/>
+
               	<li class="list-group-item">
 					<div class="card" style="width: 18rem;">
 						<div class="card-body">
@@ -49,6 +52,103 @@
           <div class="col-8">
 			<div id="calendar"></div>
           </div>
+
+		  <!--Modals details-->
+			<div class="modal fade" id="modal_event_detail" tabindex="-1" aria-labelledby="modal_event_detail" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Detalle de evento</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form method="POST">
+
+							<div class="mb-3">
+								<label for="detalle_id" class="form-label">ID</label>
+								<input type="text" class="form-control" id="detalle_id" name='detalle_id' readonly>
+							</div>
+							<div class="mb-3">
+								<label for="detalle_inicio" class="form-label">Fecha inicio</label>
+								<input type="date" name="detalle_inicio" id="detalle_inicio" value="2023-03-10" >
+								<input type="time" name="detalle_inicio_hora" id='detalle_inicio_hora' value="12:00" >
+							</div>
+							<div class="mb-3">
+								<label for="detalle_fin" class="form-label">Fecha fin</label>
+								<input type="date" name="detalle_fin" id="detalle_fin" value="2023-03-10" >
+								<input type="time" name="detalle_fin_hora" id='detalle_fin_hora' value="12:00" >
+							</div>
+							<div class="mb-3">
+								<label for="detalle_chofer" class="form-label">Chofer</label>
+								<input type="text" class="form-control" id="detalle_chofer" name='detalle_chofer' readonly>
+							</div>
+							<div class="mb-3">
+								<label for="detalle_tens" class="form-label">Tens</label>
+								<input type="text" class="form-control" id="detalle_tens" name='detalle_tens' readonly>
+							</div>
+							<div class="mb-3">
+								<label for="detalle_ambulancia" class="form-label">Ambulancia</label>
+								<input type="text" class="form-control" id="detalle_ambulancia" name='detalle_ambulancia' readonly>
+							</div>
+
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+						<button type="button" class="btn btn-success" onclick="preguntar_actualizar_fecha_evento()">Actualizar</button>
+						<a id='detalle_url_editar' href="" class="btn btn-primary">Editar</a>
+					</div>
+					</div>
+				</div>
+			</div>
+
+			<!--Modal confirm change date-->
+			<div class="modal fade" id="modal_confirm" tabindex="-1" aria-labelledby="modal_confirm" aria-hidden="true">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title" id="exampleModalLabel">¿Confirmación de cambio de horario?</h5>
+					  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form method="POST">
+							<input type="hidden" id='event_id_modificar' name='event_id_modificar' value=''> 
+							<h2>Actual horario</h2>
+							<div class="mb-3">
+								<label for="actual_inicio" class="form-label">Fecha inicio</label>
+								<input type="date" name="actual_inicio" id="actual_inicio" value="">
+								<input type="time" name="actual_inicio_hora" id='actual_inicio_hora' value="">
+							</div>
+							<div class="mb-3">
+								<label for="actual_fin" class="form-label">Fecha fin</label>
+								<input type="date" name="actual_fin" id="actual_fin" value="">
+								<input type="time" name="actual_fin_hora" id='actual_fin_hora' value="">
+							</div>
+						</form>
+
+						<form method="POST">
+							<h2>Nuevo horario</h2>
+							<div class="mb-3">
+								<label for="nuevo_inicio" class="form-label">Fecha inicio</label>
+								<input type="date" name="nuevo_inicio" id="nuevo_inicio" value="">
+								<input type="time" name="nuevo_inicio_hora" id='nuevo_inicio_hora' value="">
+							</div>
+							<div class="mb-3">
+								<label for="nuevo_fin" class="form-label">Fecha fin</label>
+								<input type="date" name="nuevo_fin" id="nuevo_fin" value="">
+								<input type="time" name="nuevo_fin_hora" id='nuevo_fin_hora' value="">
+							</div>
+						</form>
+
+					</div>
+					<div class="modal-footer">
+					  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+					  <button type="button" class="btn btn-primary" onclick="actualizar_fecha_evento()">Aceptar</button>
+					</div>
+				  </div>
+				</div>
+			  </div>
+
         </div>
 {% endblock %}
 
@@ -56,18 +156,21 @@
 	<script src="{% static 'js/calendar/index.global.min.js' %}" ></script>
 	<script src="{% static 'js/calendar/index_bootstrap5.global.min.js' %}" ></script>
 	<script>
+		var calendar;
 		document.addEventListener('DOMContentLoaded', function() {
 		  var calendarEl = document.getElementById('calendar');
 	  
-		  var calendar = new FullCalendar.Calendar(calendarEl, {
+		calendar = new FullCalendar.Calendar(calendarEl, {
 			headerToolbar: {
 			  left: 'prev,next today',
 			  center: 'title',
-			  right: 'dayGridMonth',
+			  right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
 			},
 			buttonText: {
 				month: 'Mes',
-				today: 'Hoy'
+				today: 'Hoy',
+				day: 'Día',
+				week: 'Semana',
 			},
 			views: {
 				dayGrid: {
@@ -84,25 +187,45 @@
 			initialDate: '{{ fecha_hoy|safe }}',
 			navLinks: true, // can click day/week names to navigate views
 			editable: true,
+			selectable: true,
 			dayMaxEvents: true, // allow "more" link when too many events
-			  eventClick: function(info) {
+			businessHours: true, // display business hours
+			eventClick: function(info) {
 				// código a ejecutar cuando se hace clic en un evento
 				console.log('title:', info.event.title);
 				console.log('start:', info.event.start);
 				console.log('end:', info.event.end);
 				console.log('groupId:', info.event.groupId);
-			  },
+				if (info.event.groupId!=''){
+					armar_modal_detalles_del_evento(info.event.groupId)
+				}
+				
+			},
+			eventDrop: function(info) {
+				// Obtener el evento que fue arrastrado
+				var event = info.event;
+				// Obtener la nueva fecha de inicio
+				var newStart = event.start.toISOString().slice(0, 19).replace('T', ' ');
+				// Obtener la nueva fecha de fin
+				var newEnd = event.end.toISOString().slice(0, 19).replace('T', ' ');
+				// Realizar la llamada AJAX para guardar los cambios en el backend
+				// ...
+				// Mostrar una notificación de que se guardaron los cambios
+				console.log('event:', event.title, 'newStart:', newStart, 'newEnd:', newEnd)
+				get_ask_change_event(info.event.groupId, newStart, newEnd)
+			},
 			events: [
 				{% for reserva in reservas %}
 					{
 						"groupId": "{{reserva.pk}}",
-						"title": "Reserva N {{reserva.pk}}",
-						"start": "{{ reserva.fecha_inicio|date:'Y-m-d' }}",
-						"end": "{{ reserva.fecha_fin|date:'Y-m-d' }}",
-						"backgroundColor": '#3788d8',
+						"title": "Reserva Nª {{reserva.pk}}",
+						"start": "{{ reserva.fecha_inicio|date:'Y-m-d\TH:i:s' }}",
+						"end": "{{ reserva.fecha_fin|date:'Y-m-d\TH:i:s' }}",
+						"backgroundColor": '#3788d8', //#8fdf82 //#3788d8
 						"borderColor":'#000000',
-						"textColor": '#FFFFF'
-					}
+						"textColor": '#FFFFF',
+						"editable": true
+					},
 				{% endfor %}
 			]
 		  });
@@ -110,6 +233,141 @@
 		  calendar.setOption('firstDay', '1');
 		  calendar.render();
 		});
-	  
+	  </script>
+	  <script>
+		/**
+			Funcion que llama a un ajax para obtener el detalle de un evento en particular
+		*/
+		function get_detail_event(event_id){
+			var url_event = $("#event_"+event_id+"_url_detail_ajax").val();
+			return $.ajax({
+				url: url_event,
+				type: 'GET',
+				data: {},
+				dataType: 'json',
+				success: function(response) {
+					return response.detail;
+				},
+				error: function(xhr, status, error) {
+					console.log(error);
+				}
+			});
+		}
+
+		/**
+			
+		*/
+		function get_ask_change_event(event_id, new_start_date, new_end_date){
+			//armo el modal con la informacion
+			armar_modal_confirmar_cambio(event_id, new_start_date, new_end_date)
+		}
+
+		/**
+			
+		*/
+		function get_confirmation_change_event(event_id, new_start_date, new_end_date){
+			var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+			return $.ajax({
+				url: '{% url "reserva:ajax-asignacion-change" %}',
+				type: 'POST', // o 'POST' si se necesita enviar datos
+				data: {
+					'csrfmiddlewaretoken': csrftoken,
+					'event_id': event_id,
+					'new_start_date': new_start_date,
+					'new_end_date': new_end_date
+				},
+				dataType: 'json',
+				success: function(response) {
+					console.log(response);
+				},
+				error: function(xhr, status, error) {
+					console.log(error);
+				}
+			});	
+		}
+
+		/**
+			
+		*/
+		function armar_modal_confirmar_cambio(event_id, new_start_date, new_end_date){
+
+			get_detail_event(event_id).then(function(respuesta) {
+
+				var evento_a_modificar  = respuesta.detail;
+
+				$("#event_id_modificar").val(event_id)
+
+				//fechas actuales
+				$("#actual_inicio").val(evento_a_modificar.inicio.split('T')[0])
+				$("#actual_inicio_hora").val(evento_a_modificar.inicio.split('T')[1])
+				$("#actual_fin").val(evento_a_modificar.fin.split('T')[0])
+				$("#actual_fin_hora").val(evento_a_modificar.fin.split('T')[1])
+
+				//fechas nuevas
+				$("#nuevo_inicio").val(new_start_date.split(' ')[0])
+				$("#nuevo_inicio_hora").val(new_start_date.split(' ')[1])
+				$("#nuevo_fin").val(new_end_date.split(' ')[0])
+				$("#nuevo_fin_hora").val(new_end_date.split(' ')[1])
+
+				$('#modal_confirm').modal('show');
+
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				console.log("La petición AJAX falló: " + textStatus + ", " + errorThrown);
+			});
+		}
+
+		/**
+			
+		*/
+		function armar_modal_detalles_del_evento(event_id){
+
+			get_detail_event(event_id).then(function(respuesta) {
+
+				var detalle = respuesta.detail;
+
+				$("#detalle_id").val(detalle.id)
+				$("#detalle_id").val(detalle.id)
+				
+				$("#detalle_inicio").val(detalle.inicio.split('T')[0])
+				$("#detalle_inicio_hora").val(detalle.inicio.split('T')[1])
+
+				$("#detalle_fin").val(detalle.fin.split('T')[0])
+				$("#detalle_fin_hora").val(detalle.fin.split('T')[1])
+
+				$("#detalle_chofer").val(detalle.chofer)
+				$("#detalle_tens").val(detalle.tens)
+				$("#detalle_ambulancia").val(detalle.ambulancia)
+				
+				$('#detalle_url_editar').attr('href', $("#event_"+event_id+"_url_detail").val() );
+				$('#modal_event_detail').modal('show');
+
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				console.log("La petición AJAX falló: " + textStatus + ", " + errorThrown);
+			});
+		}
+
+		/**
+		*/
+		function preguntar_actualizar_fecha_evento(){
+			$('#modal_event_detail').modal('hide');
+			get_ask_change_event(
+				$("#detalle_id").val(), 
+				$("#detalle_inicio").val()+' '+$("#detalle_inicio_hora").val(), 
+				$("#detalle_fin").val()+' '+$("#detalle_fin_hora").val()
+			)
+		}
+		function actualizar_fecha_evento(){
+		
+			get_confirmation_change_event(
+				$("#event_id_modificar").val(), 
+				$("#nuevo_inicio").val()+' '+$("#nuevo_inicio_hora").val(), 
+				$("#nuevo_fin").val()+' '+$("#nuevo_fin_hora").val()
+			).then(function(respuesta) {
+				location.reload();
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				console.log("La petición AJAX falló: " + textStatus + ", " + errorThrown);
+			});
+		}
 	  </script>
 {% endblock %}
